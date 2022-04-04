@@ -1,9 +1,0 @@
-dispatch:
-  - url: "clustertracker.big-tree.ucsc.edu/training/*"
-    service: cluster-tracker-training
-  - url: "www.clustertracker.big-tree.ucsc.edu/training/*"
-    service: cluster-tracker-training
-  - url: "cluster-tracker.big-tree.ucsc.edu/training/*"
-    service: cluster-tracker-training
-  - url: "www.cluster-tracker.big-tree.ucsc.edu/training/*"
-    service: cluster-tracker-training  
