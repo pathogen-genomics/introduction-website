@@ -1,3 +1,10 @@
 runtime: python39
 service: cluster-tracker-training
 entrypoint: python3 -m http.server 8080
+
+handlers:
+# Handle the main page by serving the index page.
+# Note the $ to specify the end of the path, since app.yaml does prefix matching.
+- url: /$
+  static_files: training/index.html
+  upload: training/index.html
