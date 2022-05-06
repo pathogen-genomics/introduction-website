@@ -204,18 +204,26 @@ function loadTargetTable(target) {
         csv_options: {separator: '\t', delimiter: '\t'},
         datatables_options: {"paging": true, "searching": true, "order": [[9,"desc"]]},
         custom_formatting: [
-            [11, function (data,type,row,meta) {
+            [12, function (data,type,row,meta) {
+                var txt = "strainhub.html?n=" + data;
+                if (txt.includes("County")) {
+                    return '<a href="' + encodeURI(txt) + '" title="Click to View Network in StrainHub" target="_blank">View Network</a>';
+                } else {
+                    return '<div title="Network only available for California clusters.">N/A</div>';
+                }
+              }
+            ],[11, function (data,type,row,meta) {
                 var items = data.split("\t");
                 var txt = items[0].trim();
                 if (txt.includes("No identifiable samples")) {
                    return '<div title="No CDPH sample IDs were found in this cluster.">' + txt + "</div>";
                 } else {
                     var n = (items[1].match(/,/g) || []).length + 1;
-                    return '<a href="' + encodeURI(txt) + '" title="Click to View in CA Big Tree Investigator" target="_blank">View ' + n + ' Samples</a>';
+                    return '<a href="' + encodeURI(txt) + '" title="Click to View in Investigator" target="_blank">View ' + n + ' Samples</a>';
                 }
               }
             ],[10, function (data,type,row,meta) {
-                return '<a href="' + encodeURI(data) + '" title="Click to View in Taxonium" target="_blank">View Cluster</a>';
+                return '<a href="' + encodeURI(data) + '" title="Click to View in CA Big Tree" target="_blank">View Cluster</a>';
               }
             ],[9, function (data,type,row,meta) {
                 return '<div title="Importance estimate based on cluster size and age. Not directly comparable between regions with varying sequencing levels.">' + data + "</div>"

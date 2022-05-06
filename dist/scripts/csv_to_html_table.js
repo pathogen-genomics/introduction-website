@@ -1,15 +1,21 @@
 function mergeFields(data) {
-    //merges last two fields in the data table
+    //merges last two fields in the data table and add StrainHub link
     var i = data.length;
     var j = data[0].length - 1;
     var newdata = new Array(i).fill(0).map(() => new Array(j).fill(0));
-    for (j = 0; j < data[0].length - 1; j++) {
-        newdata[0][j] = data[0][j];
+    for (j = 0; j < data[0].length; j++) {
+        if (j == data[0].length - 1) {
+            newdata[0][j] = "Click to View Network in StrainHub";
+        } else {
+            newdata[0][j] = data[0][j];
+        }
     }
     for (i = 1; i < data.length; i++) {
+        cluster = data[i][0];
         for (j = 0; j < data[i].length; j++) {
             if (j == data[i].length - 1) {
                 newdata[i][j - 1] = newdata[i][j - 1] + "\t" + data[i][j];
+                newdata[i][j] = cluster;
             } else {
                 newdata[i][j] = data[i][j];
             }

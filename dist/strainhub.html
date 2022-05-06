@@ -28,9 +28,12 @@ div.hide {display: none;}
     let urlObject = new URL(document.URL);
     let urlSearchParams = urlObject.searchParams;
 
-    let cluster = urlSearchParams.get("c");
+    let CTnode = urlSearchParams.get("n");
     let type = urlSearchParams.get("t");
-    console.log(cluster, type);
+    console.log(CTnode, type); // DEBUG
+    if (type==null) {
+            type = "net";
+    }
 </script>
     <body>
         <div id="status_msg" class="warning hide" onclick="hideMsg()"></div>
@@ -110,22 +113,22 @@ div.hide {display: none;}
                     document.getElementById('btn_net').style.display = "inline";
                 }
                 // title
-                document.getElementById('net-title').innerHTML = "Transmission Network for " + cluster;
-                document.getElementById('map-title').innerHTML = "Network Map for " + cluster;
+                document.getElementById('net-title').innerHTML = "Transmission Network for " + CTnode;
+                document.getElementById('map-title').innerHTML = "Network Map for " + CTnode;
                 // download links
                 url = "'https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/strainhub/";
                 link = "<a href=" + url;
                 endlink = "";
-                var dlRds = link + cluster + ".nwk_StrainHub_network.RDS'>RDS</a>";
-                //var dlNet = link + cluster + ".html'>HTML</a>";
-                var dlMap = link + cluster + "_map.html'>HTML</a>";
+                var dlRds = link + CTnode + ".nwk_StrainHub_network.RDS'>RDS</a>";
+                //var dlNet = link + CTnode + ".html'>HTML</a>";
+                var dlMap = link + CTnode + "_map.html'>HTML</a>";
                 document.getElementById('dl-rds').innerHTML = dlRds;
                 //document.getElementById('dl-net').innerHTML = dlNet;
                 document.getElementById('dl-map').innerHTML = dlMap;
             }
             init(type);
-            if (cluster!=null) {
-                jfile = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/strainhub/" + cluster + "_network.json";
+            if (CTnode!=null) {
+                jfile = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/strainhub/" + CTnode + "_network.json";
                 readJSONFile(jfile, function(text){
                     var data = JSON.parse(text);
                     console.log(data.nodes);
