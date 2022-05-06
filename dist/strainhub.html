@@ -1,0 +1,155 @@
+<html>
+<title>CA Big Tree Cluster Tracker</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials">
+<link rel="stylesheet" href="css/custom.css">
+<link rel="stylesheet" href="css/strainhub.css">
+<link rel="stylesheet" href="css/visnetwork.css">
+<script type="text/javascript" src="scripts/vis.js"></script>
+<style type="text/css">
+body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+.w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+.fa-anchor,.fa-coffee {font-size:200px}
+.dropdown {position: relative; display: inline-block; width: 150px}
+.dropdown-content {display: none; position: absolute; z-index: 2000; width: 100%; background-color:#f1f1f1; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2)} 
+.timel {display: block; width: 100%; text-align: center;}
+.show {display:block;}
+div.hide {display: none;}
+</style>
+
+<script type="text/javascript">
+    let urlObject = new URL(document.URL);
+    let urlSearchParams = urlObject.searchParams;
+
+    let cluster = urlSearchParams.get("c");
+    let type = urlSearchParams.get("t");
+    console.log(cluster, type);
+</script>
+    <body>
+        <div id="status_msg" class="warning hide" onclick="hideMsg()"></div>
+        <h1>California Big Tree Cluster Tracker </h1>
+        <div class="dropdown">
+            <button onclick="window.location.assign('index.html')" class="dropbtn">Return to Cluster-Tracker Map</button>
+        </div>
+        <div class="dropdown" id="btn_map">
+            <button onclick="init('map')" class="dropbtn">Show Transmission Map</button>
+        </div>
+        <div class="dropdown" id="btn_net">
+            <button onclick="init('net')" class="dropbtn">Show Transmission Network</button>
+        </div>
+        
+        <div id="network" style="display:none">
+            <h2 class="sh_title"><span id="net-title">Transmission Network - Degree Centrality</span></h2>
+            <div id="mynetwork"></div>
+        </div>
+
+        <div id="map" style="display:none">
+            <h2 class="sh_title"><span id="map-title">Network Map</span></h2>
+            <div class="container">
+                <iframe  class="responsive-iframe" 
+                    src="https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/strainhub/individual_map.html">
+                </iframe>
+            </div>
+        </div>
+        
+        
+        <script src="scripts/check_status.js"></script>
+        
+        
+        Download the StrainHub network file from this analysis in 
+        <span id="dl-rds">
+            RDS
+        </span> (R data Structure) or 
+        <span id="dl-net">
+            HTML
+        </span>
+         format.<br/>
+        Download the StrainHub map file from this analysis in 
+        <span id="dl-map">
+            HTML
+        </span> 
+        format.
+
+        <p>Please post an issue at <a title="The github repository for this site." href="https://github.com/pathogen-genomics/introduction-website" target="_blank">the github</a> or email us at help-pathogengenomics@ucsc.edu if you have questions or feedback.</p>
+
+        <div style="text-align: right;">
+            Powered by <img src="strainhub_logo.png" alt="Strain Hub" height="50" style="vertical-align:bottom">
+        </div>
+
+        <script type="text/javascript">
+            function readJSONFile(file, callback) {
+                var rawFile = new XMLHttpRequest();
+                rawFile.overrideMimeType("application/json");
+                rawFile.open("GET", file, true);
+                rawFile.onreadystatechange = function() {
+                    if (rawFile.readyState === 4 && rawFile.status == "200") {
+                        callback(rawFile.responseText);
+                    }
+                }
+                rawFile.send(null);
+            }
+            function init(type) {
+                if (type=="net") {
+                    document.getElementById('network').style.display = "block";
+                    el = document.getElementById('map');
+                    el.style.display = "none";
+                    document.getElementById('btn_map').style.display = "inline";
+                    document.getElementById('btn_net').style.display = "none";
+                } else if (type=="map") {
+                    document.getElementById('network').style.display = "none";
+                    el = document.getElementById('map');
+                    el.style.display = "block";
+                    document.getElementById('btn_map').style.display = "none";
+                    document.getElementById('btn_net').style.display = "inline";
+                }
+                // title
+                document.getElementById('net-title').innerHTML = "Transmission Network for " + cluster;
+                document.getElementById('map-title').innerHTML = "Network Map for " + cluster;
+                // download links
+                url = "'https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/strainhub/";
+                link = "<a href=" + url;
+                endlink = "";
+                var dlRds = link + cluster + ".nwk_StrainHub_network.RDS'>RDS</a>";
+                //var dlNet = link + cluster + ".html'>HTML</a>";
+                var dlMap = link + cluster + "_map.html'>HTML</a>";
+                document.getElementById('dl-rds').innerHTML = dlRds;
+                //document.getElementById('dl-net').innerHTML = dlNet;
+                document.getElementById('dl-map').innerHTML = dlMap;
+            }
+            init(type);
+            if (cluster!=null) {
+                jfile = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/strainhub/" + cluster + "_network.json";
+                readJSONFile(jfile, function(text){
+                    var data = JSON.parse(text);
+                    console.log(data.nodes);
+                    console.log(data.edges);
+                    //console.log(data);
+
+                    var nodes = new vis.DataSet(data.nodes);
+                    var edges = new vis.DataSet(data.edges);
+
+                    // create a network
+                    var container = document.getElementById("mynetwork");
+                    var data = {
+                      nodes: nodes,
+                      edges: edges,
+                    };
+                    var options = {
+                      nodes:{shape:"dot"},
+                      physics:{solver:"repulsion"},
+                      edges:{arrows:{to:{enabled:true, scaleFactor:0.75}}}
+                    };
+                    var network = new vis.Network(container, data, options).selectNodes([nodes.id=5]);
+                });
+            }
+
+        </script>
+    </body>
+</html>

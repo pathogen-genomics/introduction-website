@@ -1,0 +1,30 @@
+h2 {
+    text-align: center;
+}
+#mynetwork {
+  width: 100%;
+  height: 60%; 
+  
+}
+#network {
+    border: 2px solid lightgray;
+}
+#map {
+    border: 2px solid lightgray;
+}
+.container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 60%; 
+}
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
