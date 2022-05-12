@@ -1,19 +1,32 @@
+.sthub-container {
+  border: 2px solid lightgray;
+  position: relative;
+}
 h2 {
-    text-align: center;
+  text-align: center;
+  z-index: 2000;
+  top: 0px;
+
+  left:0;
+  right:0;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
 }
 #mynetwork {
   width: 100%;
-  height: 400px; 
+  height: 600px;
   
 }
 #network {
-    border: 2px solid lightgray;
+    
 }
 #map {
-  height: 400px;
+  width: 100%;
+  height: 600px;
 }
 #sh_map {
-    border: 2px solid lightgray;
+    
 }
 .sh-map-container {
   position: relative;

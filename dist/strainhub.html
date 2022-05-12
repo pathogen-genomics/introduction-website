@@ -40,6 +40,7 @@
     <body>
         <div id="status_msg" class="warning hide" onclick="hideMsg()"></div>
         <h1>California Big Tree Cluster Tracker </h1>
+        
         <div class="dropdown">
             <button onclick="window.location.assign('index.html')" class="dropbtn">Return to Cluster-Tracker Map</button>
         </div>
@@ -49,20 +50,17 @@
         <div class="dropdown" id="btn_net">
             <button onclick="showVis('net')" class="dropbtn">Show Transmission Network</button>
         </div>
-        
-        <div id="network">
-            <h2 class="sh_title"><span id="net-title">Transmission Network - Degree Centrality</span></h2>
-            <div id="mynetwork"></div>
-        </div>
 
-        <div id="sh-map">
-            <h2 class="sh_title"><span id="map-title">Network Map</span></h2>
-            <div id="map"></div>
-            <!-- <div class="sh-map-container">
-                <iframe  class="responsive-iframe" 
-                    src="https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/strainhub/individual_map.html">
-                </iframe>
-            </div> -->
+        <div class="sthub-container">
+            <div id="network">
+                <h2 class="sh_title"><span id="net-title">Transmission Network - Degree Centrality</span></h2>
+                <div id="mynetwork"></div>
+            </div>
+
+            <div id="sh-map">
+                <h2 class="sh_title"><span id="map-title">Network Map</span></h2>
+                <div id="map"></div>
+            </div>
         </div>
 
         <script src="scripts/check_status.js"></script>

@@ -1,11 +1,8 @@
 var data;
+var network;
 // Set Leaflet map properties before hiding div
   var map = L.map('map', {'tap':false}).setView([36.77, -119.418], 5);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
-    foo: 'bar', 
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
-  L.esri.basemapLayer('Gray').addTo(map);
+  
 
 // colors TO DO - get better palette with more options
 colors = ["#4e95dc","#ffb14e","#82b173","#c82727","#0000ff","#46b846","#9d02d7","#fa8775","#cd34b5","#ffd700","#ea5f94","#45d9c7"];
@@ -72,7 +69,6 @@ const regionLL = [
   {name:"Sutter_County", long:-121.6945535, lat:39.03443385}
 ]; 
 
-
 // show transmission network vis
 function showNetwork(data){
   var nodes = new vis.DataSet(data.nodes);
@@ -89,7 +85,8 @@ function showNetwork(data){
         physics:{solver:"repulsion"},
         edges:{arrows:{to:{enabled:true, scaleFactor:0.75}}}
       };
-      var network = new vis.Network(container, data, options).selectNodes([nodes.id=5]);
+      //var network = new vis.Network(container, data, options).selectNodes([nodes.id=5]); //selects a node by id
+      network = new vis.Network(container, data, options);
 }
 
 // layer style for county/state boundaries
@@ -105,6 +102,12 @@ function mapStyle(feature) {
 
 // show transmission map
 function addMapData(data){
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
+    foo: 'bar', 
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  L.esri.basemapLayer('Gray').addTo(map);
+
   //adds region polygon
   L.geoJSON(regions, {
       style: mapStyle
@@ -113,7 +116,7 @@ function addMapData(data){
   }).addTo(map);
 
    // convert network data into transmission network arrows
-  var lines =[];
+  var lines=[];
   for (var i = 0, len = data.edges.length; i < len; i++) {
       var fromIndex = data.edges[i].from;
       var toIndex = data.edges[i].to;
@@ -136,8 +139,10 @@ function addMapData(data){
       };
       lines.push(item);
   }
+  console.log(lines); //DEBUG
 
   function addLineToMap(item, index) {
+      //add transmission lines with "from" labels
       new L.swoopyArrow(item.fromLL, item.toLL, {
         label: item.fromLabel,
         color: item.color, 
@@ -146,8 +151,16 @@ function addMapData(data){
         hideArrowHead: false, 
         arrowFilled: true,
         labelFontSize: 12,
+        labelColor: item.color,
         iconAnchor: [20, 10],
         iconSize: [20, 16]
+      }).addTo(map);
+      // reverse transmission lines to display "to" labels
+      new L.swoopyArrow(item.toLL, item.fromLL, {
+        label: item.toLabel,
+        weight: 0, 
+        labelFontSize: 12,
+        labelColor: item.color
       }).addTo(map);
   }
   lines.forEach(addLineToMap);
@@ -162,6 +175,7 @@ function showVis(type) {
         el.style.display = "none";
         document.getElementById('btn_map').style.display = "inline";
         document.getElementById('btn_net').style.display = "none";
+        //network.redraw(); //debug - did not work
     } else if (type=="map") {
         document.getElementById('network').style.display = "none";
         el = document.getElementById('sh-map');
