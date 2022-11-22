@@ -1,23 +1,27 @@
-var map = L.map('mapid', {'tap':false}).setView([36.77, -119.418], 5);
+var map = L.map('mapid', {'tap': false}).setView([36.77, -119.418], 5);
 var global_state = "default";
 var global_time = "";
 var global_state_id = "00";
-// var host = "raw.githubusercontent.com/jmcbroome/introduction-website/main/"
 var map_colors = ['#800026','#BD0026','#E31A1C','#FC4E2A','#FD8D3C','#FEB24C','#FED976','#FFEDA0'];
 var color_scale = "log";
-var max_basecount = 0;
-for (i = 0; i < introData.features.length; i++) {
-    let bc = introData.features[i]["properties"]["intros"]["basecount"];
-    if (bc > max_basecount) {
-        max_basecount = bc;
+var map_layer = 0; //0=county data, 1=state data
+var alldata =[introData, introData_us];
+var max_basecount = [0,0];
+for (j = 0; j < 2; j++) {
+    for (i = 0; i < alldata[j].features.length; i++) {
+        let bc = alldata[j].features[i]["properties"]["intros"]["basecount"];
+        if (bc > max_basecount[j]) {
+            max_basecount[j] = bc;
+        }
     }
 }
 
-function maxClusterCt(region_id,timel) {
+
+function maxClusterCt(region_id,timel,map_layer) {
     var maxn = 0;
     let item = timel + "raw" + region_id;
-    for (i = 0; i < introData.features.length; i++) {
-        let c = introData.features[i]["properties"]["intros"][item];
+    for (i = 0; i < alldata[map_layer].features.length; i++) {
+        let c = alldata[map_layer].features[i]["properties"]["intros"][item];
         if (c > maxn) {
             maxn = c;
         }
@@ -25,14 +29,14 @@ function maxClusterCt(region_id,timel) {
     return maxn;
 }
 
-function getColorBase(d) {
-    return d > max_basecount * 0.9 ? map_colors[0] :
-           d > max_basecount * 0.75   ? map_colors[1] :
-           d > max_basecount * 0.5   ? map_colors[2] :
-           d > max_basecount * 0.25   ? map_colors[3] :
-           d > max_basecount * 0.1    ? map_colors[4] :
-           d > max_basecount * 0.05   ? map_colors[5] :
-           d > max_basecount * 0.01    ? map_colors[6] :
+function getColorBase(d,map_layer) {
+    return d > max_basecount[map_layer] * 0.9 ? map_colors[0] :
+           d > max_basecount[map_layer] * 0.75   ? map_colors[1] :
+           d > max_basecount[map_layer] * 0.5   ? map_colors[2] :
+           d > max_basecount[map_layer] * 0.25   ? map_colors[3] :
+           d > max_basecount[map_layer] * 0.1    ? map_colors[4] :
+           d > max_basecount[map_layer] * 0.05   ? map_colors[5] :
+           d > max_basecount[map_layer] * 0.01    ? map_colors[6] :
                       map_colors[7];
 }
 
@@ -97,21 +101,9 @@ function setTimeLabels(sel) {
     }
 }
 
-function setColorLabels(sel) {
-    if (sel == 0) {
-        //raw cluster counts
-        document.getElementById("btn_color_0").classList.add("btn_selected");
-        document.getElementById("btn_color_1").classList.remove("btn_selected");
-    } else if (sel == 1) {
-        //log fold enrichment
-        document.getElementById("btn_color_0").classList.remove("btn_selected");
-        document.getElementById("btn_color_1").classList.add("btn_selected");
-    }
-}
-
 function style(feature) {
     return {
-        fillColor: getColorBase(feature.properties.intros[global_time + "basecount"]),
+        fillColor: getColorBase(feature.properties.intros[global_time + "basecount"], map_layer),
         weight: 2,
         opacity: 1,
         color: 'white',
@@ -120,13 +112,20 @@ function style(feature) {
     };
 }
 
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 
-var geojson;
-geojson = L.geoJson(introData, {
+var geojson = [];
+geojson[0] = L.geoJson(alldata[0], {
     style: style,
     onEachFeature: onEachFeature
-}).addTo(map);
+});
+map.addLayer(geojson[0]);
+geojson[1] = L.geoJson(alldata[1], {
+    style: style,
+    onEachFeature: onEachFeature
+});
+
 
 //control to display data for each region on hover
 var info = L.control();
@@ -164,16 +163,6 @@ info.update = function (props) {
             str += deftext;
         }
     }
-    // // append time display period
-    // if (global_time == '') {
-    //     str += '<br />Since start of pandemic';
-    // } else if (global_time == '12_') {
-    //     str += '<br />Last 12 months';
-    // } else if (global_time == '6_') {
-    //     str += '<br />Last 6 months';
-    // } else if (global_time == '3_') {
-    //     str += '<br />Last 3 months';
-    // }
     this._div.innerHTML = str;
 };
 
@@ -205,80 +194,18 @@ function resetHighlight(e) {
     info.update();
 }
 
-function loadTargetTable(target) {
-    CsvToHtmlTable.init({
-        csv_path: target, 
-        element: 'table-container', 
-        allow_download: false,
-        csv_options: {separator: '\t', delimiter: '\t'},
-        datatables_options: {"paging": true, "searching": true, "order": [[9,"desc"]]},
-        custom_formatting: [
-            [11, function (data,type,row,meta) {
-                var items = data.split("\t");
-                var txt = items[0].trim();
-                if (txt.includes("No identifiable samples")) {
-                   return '<div title="No CDPH sample IDs were found in this cluster.">' + txt + "</div>";
-                } else {
-                    var n = (items[1].match(/,/g) || []).length + 1;
-                    return '<a href="' + encodeURI(txt) + '" title="Click to View in CA Big Tree Investigator" target="_blank">View ' + n + ' Samples</a>';
-                }
-              }
-            ],[10, function (data,type,row,meta) {
-                return '<a href="' + encodeURI(data) + '" title="Click to View in Taxonium" target="_blank">View Cluster</a>';
-              }
-            ],[9, function (data,type,row,meta) {
-                return '<div title="Importance estimate based on cluster size and age. Not directly comparable between regions with varying sequencing levels.">' + data + "</div>"
-              }
-            ],[8, function (data,type,row,meta) {
-                return '<div title="Confidence metric for the origin; 1 is maximal, 0 is minimal.">' + data + "</div>"
-              }
-            ],[7, function (data,type,row,meta) {
-                data = data.replace(/_/g, " "); // replace underscore with space for origin name
-                return '<div title="The origin region with the greatest weight. May not be the true origin, especially if the corresponding confidence value is below 0.5.">' + data + "</div>"
-              }
-            ],[6, function (data,type,row,meta) {
-                return '<div title="Pangolin lineage of the ancestral introduction.">' + data + "</div>"
-              }
-            ],[5, function (data,type,row,meta) {
-                return '<div title="Nextstrain clade of the ancestral introduction.">' + data + "</div>"
-              }
-            ],[4, function (data,type,row,meta) {
-                return '<div title="Date of the latest sample from this cluster.">' + data + "</div>"
-              }
-            ],[3, function (data,type,row,meta) {
-                return '<div title="Date of the earliest sample from this cluster.">' + data + "</div>"
-              }
-            ],[2, function (data,type,row,meta) {
-                return '<div title="Number of samples in this cluster.">' + data + "</div>"
-              }
-            ],[1, function (data,type,row,meta) {
-                data = data.replace(/_/g, " "); // replace underscore with space for region name
-                return '<div title="Region of this cluster.">' + data + "</div>"
-              }
-            ],[0, function (data,type,row,meta) {
-                data = data.replace(/_/g, " "); // replace underscore with space for node name
-                return '<div title="The identifier of the internal node inferred to be the ancestral introduction. Can be used with the public protobuf and matUtils.">' + data + "</div>"
-              }
-            ]
-        ]
-      });
-}
-
 function resetView(e) {
-    geojson.eachLayer(function (layer) {
-        geojson.resetStyle(layer);
+    geojson[map_layer].eachLayer(function (layer) {
+        geojson[map_layer].resetStyle(layer);
     });
     global_state = "default";
     global_state_id = "00";
-    document.getElementById("colorbtn").disabled = true;
+    var btn = document.getElementById("colorbtn");
+    btn.disabled = true;
+    btn.innerText = "Show Raw Cluster Count";
+    color_scale = "log";
     legend.update(global_state);
-    loadTargetTable('https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/default_clusters.tsv');
-}
-
-function loadStateTable(e) {
-    var fname = e.target.feature.properties.name.trim().replace(/\s+/g, '_')
-    let path = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/" + fname + "_topclusters.tsv";
-    loadTargetTable(path);
+    showRegion(global_state);
 }
 
 function changeMap(time) {
@@ -290,7 +217,7 @@ function changeMap(time) {
         global_time = time + "_";
     }
     if (global_state != "default") {
-        geojson.eachLayer(function (layer) {
+        geojson[map_layer].eachLayer(function (layer) {
             if (layer.feature.id == global_state_id) {
                 layer.setStyle({fillColor: "#1a0080"});
             } else {
@@ -312,29 +239,29 @@ function changeView(e) {
     if (e.target.options.fillColor == "#1a0080") {
         resetView(e);
     } else {
-        loadStateTable(e);
         global_state = e.target.feature.properties.name;
         global_state_id = e.target.feature.id;
         clicklayer.setStyle({fillColor: "#1a0080"});
         colorIntros();
         document.getElementById("colorbtn").disabled = false;
         legend.update(global_state);
+        showRegion(global_state);
     }
 }
 
 function colorIntros() {
     if (color_scale == "raw") {
         //find max number of clusters
-        let maxn = maxClusterCt(global_state_id,global_time);
+        let maxn = maxClusterCt(global_state_id,global_time,map_layer);
         //set colors
-        geojson.eachLayer(function (layer) {
+        geojson[map_layer].eachLayer(function (layer) {
             if (layer.feature.id != global_state_id) {
                 layer.setStyle({fillColor: getColorIntroN(layer.feature.properties.intros[global_time + "raw" + global_state_id],maxn)});
             }
         });
     } else {
         //set colors
-        geojson.eachLayer(function (layer) {
+        geojson[map_layer].eachLayer(function (layer) {
             if (layer.feature.id != global_state_id) {
                 layer.setStyle({fillColor: getColorIntro(layer.feature.properties.intros[global_time + global_state_id])});
             }
@@ -343,18 +270,47 @@ function colorIntros() {
     // update legend
     legend.update(global_state);
 }
+
 function changeScale() {
-    if (global_state != "default"){
-        if (color_scale == "log") {
-            color_scale = "raw";
-            setColorLabels(0);
-            colorIntros();
-        } else {
-            color_scale = "log";
-            setColorLabels(1);
-            colorIntros();
-        }
+    var btn = document.getElementById("colorbtn");
+    if (color_scale == "log") {
+        color_scale = "raw";
+        btn.innerText = "Show Log Fold Enrichment";
+        colorIntros();
+    } else {
+        color_scale = "log";
+        btn.innerText = "Show Raw Cluster Count";
+        colorIntros();
     }
+}
+
+function swap_countystate() {
+    var btn = document.getElementById("btn_SC");
+    color_scale = "log";
+    global_state = "default";
+    if (btn.innerText == "Show CA State Introductions") {
+        btn.innerText = "Show CA County Introductions";
+        map.removeLayer(geojson[0]);
+        map.addLayer(geojson[1]);
+        map_layer = 1;
+    } else {
+        btn.innerText = "Show CA State Introductions";
+        map.removeLayer(geojson[1]);
+        map.addLayer(geojson[0]);
+        map_layer = 0;
+    }
+    resetView();
+    // load new dataset into grid
+    let df = cDataFile;
+    let ds = cSampleFile;
+    if (map_layer == 1) {
+        const ext = "_us";
+        let pos = cDataFile.length - 8;
+        df = cDataFile.substring(0, pos) + ext + cDataFile.substring(pos);
+        pos = cSampleFile.length - 8;
+        ds = cSampleFile.substring(0, pos) + ext + cSampleFile.substring(pos);
+    }
+    initCTGrid(dataHost, taxoniumHost, df, ds);
 }
 
 var legend = L.control({position: 'bottomleft'});
@@ -420,7 +376,7 @@ function getLegendBins(max) {
 
 // legend for US clusters
 const legend_default = '<strong>Number of Clusters</strong><br>' +
-        getLegendBins(max_basecount);
+        getLegendBins(max_basecount[0]);
 // legend for log fold enrichment
 const legend_log = '<strong>Introductions</strong><br>'+
          '<small>Log<sub>10</sub>fold enrichment</small><br>' + 
@@ -441,7 +397,7 @@ legend.update = function (props) {
     if (props != "default") {
         if (color_scale == "raw") {
             //show number of clusters
-            let maxn = maxClusterCt(global_state_id,global_time);
+            let maxn = maxClusterCt(global_state_id,global_time,map_layer);
             ltext = '<strong>Number of<br>Introductions</strong><br>';
             ltext += getLegendBins(maxn);
             ltext += '<br><i style="background:#1a0080"></i>Focal Region';

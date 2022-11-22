@@ -8,10 +8,13 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"/>       
-<link rel="stylesheet" href="lib/leafletjs/leaflet.css">
-<link rel="stylesheet" href="css/custom.css">
+<link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials">
+<link rel="stylesheet" href="lib/slickgrid/slick.grid.css" type="text/css"/>
+<link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css" type="text/css"/>
+<link rel="stylesheet" href="lib/slickgrid/controls/slick.pager.css" type="text/css"/>
+<link rel="stylesheet" href="lib/leafletjs/leaflet.css" type="text/css"/>
+<link rel="stylesheet" href="css/gridstyles.css" type="text/css"/>
+<link rel="stylesheet" href="css/custom.css" type="text/css"/>
 <style>
 body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
@@ -20,16 +23,21 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 .dropdown-content {display: none; position: absolute; z-index: 2000; width: 100%; background-color:#f1f1f1; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2)} 
 .timel {display: block; width: 100%; text-align: center;}
 .show {display:block;}
+div.hide {display: none;}
 </style>
     <body>
+        <div id="status_msg" class="warning hide" onclick="hideMsg()"></div>
         <h1>California Big Tree Cluster Tracker </h1>
         <script>
-            function showList(op) {
-                if (op == "time") {
-                    document.getElementById("myDropdown").classList.toggle("show");
-                } else if (op == "color") {
-                    document.getElementById("myDropColor").classList.toggle("show");
-                }
+            dataHost = 'https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/';
+            taxoniumHost = ['https%3A%2F%2Ftaxonium.cluster-tracker.big-tree.ucsc.edu%2F', 'https%3A%2F%2Fclustertracker-california-taxonium-backend-6twdguah7a-uw.a.run.app'];
+            cDataFile = 'cluster_data.json.gz';
+            cSampleFile = 'sample_data.json.gz';
+            ext = '';
+
+
+            function showList() {
+                document.getElementById("myDropdown").classList.toggle("show");
             }
             window.onclick = function(event) {
                 if (!event.target.matches('.dropbtn')) {
@@ -44,20 +52,19 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
                 }
             }
         </script>
+        <div class="dropdown" id="drop_SC">
+            <button onclick="swap_countystate()" class="dropbtn" id="btn_SC">Show CA State Introductions</button>
+        </div>
+        <div class="dropdown" id="dropcolor">
+            <button onclick="changeScale()" class="dropbtn" id="colorbtn" disabled>Show Raw Cluster Count</button>
+        </div>
         <div class="dropdown" id="droploc">
-            <button onclick="showList('time')" class="dropbtn">Choose Map Display Time Period</button>
+            <button onclick="showList()" class="dropbtn">Choose Map Display Time Period</button>
             <div id="myDropdown" class="dropdown-content">
                 <button id="btn_time_0" class="timel btn_selected" onclick="changeMap(0)">Whole Pandemic</p>
                 <button id="btn_time_12" class="timel" onclick="changeMap(12)">Last 12 Months</p>
                 <button id="btn_time_6" class="timel" onclick="changeMap(6)">Last 6 Months</p>
                 <button id="btn_time_3" class="timel" onclick="changeMap(3)">Last 3 Months</p>
-            </div>
-        </div>
-        <div class="dropdown" id="dropcolor">
-            <button onclick="showList('color')" class="dropbtn" id="colorbtn" disabled>Select Map Layer</button>
-            <div id="myDropColor" class="dropdown-content">
-                <button id="btn_color_0" class="timel" onclick="changeScale(0)">Raw Cluster Count</p>
-                <button id="btn_color_1" class="timel btn_selected" onclick="changeScale(1)">Log Fold Enrichment</p>
             </div>
         </div>
         <div id="display" title="This map displays the count of inferred unique families of the virus in each region by default. When a region is selected, it instead displays a scaled estimate of the count of viral introductions to the selected region from each other region.">
@@ -72,22 +79,95 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
             <p>The California Big Tree Cluster Tracker combines sequence data from the <a title="Repository containing daily-updated comprehensive global phylogenetic trees for SARS-CoV-2" target="_blank" href="https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/">global public SARS-CoV-2 phylogenetic tree</a> and sequences in California’s central repository in Terra. The Cluster Tracker applies a <a title="Wiki page describing the heuristic calculation." target="_blank" href="https://usher-wiki.readthedocs.io/en/latest/matUtils.html#introduce">heuristic</a> to identify groups of sequences in a given region that may have recently arrived from another region. These groups may reflect cases of an infected traveler entering a region, followed by local spread. Note that biases might affect these results: relative local sequencing effort, the rate sequences arrive in repositories, and accuracy of reconstructed evolutionary relationships. You can view each <span class="definition" title="The set of sequences within a region that are inferred to result from a single introduction via travel.">cluster</span> in <a title="link to California Big Tree Investigator" href="https://investigator.big-tree.ucsc.edu/" target="_blank">CA Big Tree Investigator</a> or <a title="Github repository for the Taxonium browser tree viewer" href="https://github.com/theosanderson/taxonium" target="_blank">Taxonium</a> and perform your own analysis with UCSC’s <a title="Github repository for UShER" href="https://github.com/yatisht/usher" target="_blank">UShER</a> after downloading the output files from the link below the table.
             </p>
         </div>
-        <div id="table-container"></div>
+        <div id="searchbox">
+            <div id="accordion">
+                <h3>Search</h3>
+                <div class="colContainer">
+                    <div class="lSide">
+                        <input type="text" id="txtSearch" placeholder="Search across all columns...">
+                        <button onclick="doSimpleSearch();" id="btnSimpleSearch">Search</button>
+                        <button onclick="clearFilter();" id="btnClearSearch">Clear</button>
+                        <div class="searchNote">
+                            Separate multiple search terms with a comma. Do not use spaces between search terms.
+                        </div>
+                    </div>
+                    <div class="rSide">
+                        <span class=searchSubt>Boolean Search Options</span><br>
+                        <div>
+                            <input type="radio" checked="checked" name="bool" value="and" id="boolAnd">
+                            <label for="boolAnd">AND (contains ALL search terms)</label>
+                        </div>
+                        <div>
+                            <input type="radio" name="bool" value="or" id="boolOr">
+                            <label for="boolOr">OR (contains ANY search term)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="grdContainer">
+            <div id="myGrid" style="width:100%;height:570px;"></div>
+            <div id="pager"></div>
+            <div>
+                <p class="tableNote">* = Interpret with caution. Value may not be meaningful due to small cluster size, or cluster dates were not able to be parsed.</p>
+            </div>
+        </div>
+
+        <script src="scripts/check_status.js"></script>
+
         <script src="lib/leafletjs/leaflet.js"></script>
-        <script src="https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/regions.js"></script>
-        <script src="scripts/main.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script>!window.jQuery && document.write('<script src="sripts/jquery.min.js"><\/script>')</script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/js/bootstrap.bundle.min.js"></script>
-        <script src="scripts/jquery.csv.min.js"></script>
-        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-        <script src="scripts/csv_to_html_table.js"></script> 
-        <script>
-           loadTargetTable('https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/default_clusters.tsv');
+        <script src="https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/regions.js" id="script-region"></script>
+        <script src="https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/regions_us.js" id="script-region_us"></script>
+        <script src="scripts/main.js" id="script-main"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script>!window.jQuery && document.write('<script src="lib/jquery/jquery.min.js"><\/script>')</script>
+        <script type="text/javascript">
+           // prevents loading from browser cache
+           const ver = Date.now();
+           document.getElementById('script-main').src = 'scripts/main.js?v=' + ver;
+           document.getElementById('script-region').src = 'https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/regions.js?v=' + ver;
+           document.getElementById('script-region_us').src = 'https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/regions_us.js?v=' + ver;
+
+           //checks data update status and triggers alert if needed
+           readStatus();
         </script>
-        <a href = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/hardcoded_clusters.tsv.gz", download = "sarscov2_clusters.tsv.gz">Download full output file.</a><br>
-        <a href = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/cview.pb.gz", download = "cluster_taxonium.pb.gz">Download the taxonium protobuf for viewing.</a>
-        <p>Please post an issue at <a title="The github repository for this site." href="https://github.com/pathogen-genomics/introduction-website" target="_blank">the github</a> or email us at help-pathogengenomics@ucsc.edu if you have questions or feedback.</p>
+        <!-- SlickGrid: core jquery libs -->
+        <script src="lib/jquery-ui/jquery-ui.min.js"></script>
+        <script src="lib/slickgrid/lib/jquery.event.drag-2.3.0.js"></script>
+        <!-- SlickGrid: core js-->
+        <script src="lib/slickgrid/slick.core.js"></script>
+        <script src="lib/slickgrid/slick.grid.js"></script>
+        <script src="lib/slickgrid/slick.dataview.js"></script>
+        <script src="lib/slickgrid/controls/slick.pager.js"></script>
+        <!-- SlickGrid: copy cells -->
+        <script src="lib/slickgrid/plugins/slick.cellexternalcopymanager.js"></script>
+        <script src="lib/slickgrid/plugins/slick.cellselectionmodel.js"></script>
+        <script src="lib/slickgrid/plugins/slick.cellrangedecorator.js"></script>
+        <script src="lib/slickgrid/plugins/slick.cellrangeselector.js"></script>
+        <!-- SlickGrid: resize columns -->
+        <script src="lib/slickgrid/plugins/slick.resizer.js"></script>
+        <!-- Slick Grid: tool tip -->
+        <script src="lib/slickgrid/plugins/slick.customtooltip.js"></script>
+        <!-- Gets data and loads into Slick Grid table -->
+        <script src="scripts/datagrid.js"></script>
+        <script>
+            // set jquery-ui accordian params
+            $( function() {
+                $( "#accordion" ).accordion({
+                  collapsible: true,
+                  heightStyle: "content"
+                });
+              } );
+            // itialize grid
+            initCTGrid(dataHost, taxoniumHost, cDataFile, cSampleFile);
+        </script>
+
+        <div id="downloads">
+            Download full output file from the <a href = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/hardcoded_clusters.tsv", download = "sarscov2_clusters_CA_counties.tsv">California-county based analysis</a> or the <a href = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/hardcoded_clusters_us.tsv", download = "sarscov2_clusters_CA_state.tsv">California-state based analysis</a>.<br>
+            Download the Taxonium JSONL file from the <a href = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/cview.jsonl.gz", download = "cluster_taxonium_CA_counties.jsonl.gz">California-county based analysis</a> or the <a href = "https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/training/cview_us.jsonl.gz", download = "cluster_taxonium_CA_state.jsonl.gz">California-state based analysis</a> for viewing.
+            <p>Please post an issue at <a title="The github repository for this site." href="https://github.com/pathogen-genomics/introduction-website" target="_blank">the github</a> or email us at help-pathogengenomics@ucsc.edu if you have questions or feedback.</p>
+            <p class="disclaimer">GISAID data displayed in the <i>CA Big Tree Cluster Tracker/Investigator</i> are subject to GISAID's <a href="https://www.gisaid.org/registration/terms-of-use/" target="_blank">Terms and Conditions</a>. SARS-CoV-2 genome sequences and metadata are available for download from <a href="https://gisaid.org/" target="_blank">GISAID</a> EpiCoV&trade;.</p>
+        </div>
     </body>
 </html>
