@@ -6,14 +6,7 @@
 # For more information, run:
 #   $ gcloud topic gcloudignore
 #
-
-# data files will be hosted from GCloud
-data/**
-
-# misc
 .gcloudignore
-**/.DS_Store
-
 # If you would like to upload your .git directory, .gitignore file or files
 # from your .gitignore file, remove the corresponding line
 # below:

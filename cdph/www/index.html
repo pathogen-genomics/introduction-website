@@ -135,6 +135,12 @@
             </div> <!-- end Intro text -->
 
             <div class="cardPanel"> <!-- contains map, search, and data table -->
+                <div id='loading_overlay'>
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+
                 <div class="container-fluid mapBar">
                     <div class="row">
                         <div class="col">
@@ -398,9 +404,31 @@
         <script src="https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/regions_us.js" id="script-region_us"></script>
         <script src="scripts/main.js" id="script-main"></script>
         <script type="text/javascript">
+            // Fetch with retry and exponential backoff. Returns a response object
+            async function fetchWithRetry(url, attempts = 3) {
+                // Delay in ms
+                let delay = 500;
+
+                for (let i = 0; i < attempts; i++) {
+                    try {
+                    const response = await fetch(url);
+
+                    if (response.ok) {
+                        return response;
+                    }
+                    } catch (error) {
+                    console.error(`Attempt ${attempt} failed: ${error.message}`);
+                    }
+
+                    // Exponential backoff
+                    await new Promise(resolve => setTimeout(resolve, delay *= i));
+                }
+
+                alert('Unexpected network error. Please refresh.');
+            }
 
             function setDateLastUpdated() {
-                fetch('https://storage.googleapis.com/ucsc-gi-cdph-bigtree/subtree-folder-name.txt')
+                fetchWithRetry('https://storage.googleapis.com/ucsc-gi-cdph-bigtree/subtree-folder-name.txt')
                 .then(response => response.text())
                 .then(async (directory) => {
                     const splitDirectory = directory.split('_');

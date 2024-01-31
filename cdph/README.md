@@ -16,10 +16,10 @@ The California Big Tree Cluster Tracker uses Google Cloud for storage, deploymen
 
 ```
 cd cdph/www
-python3 -m http.server
+python3 server.py
 ```
 
-The website should be available for testing at http://localhost:8000/ 
+The website should be available for testing at http://localhost:8080/ 
 
 ## Development and Testing of the Python Data Processing Scripts
 

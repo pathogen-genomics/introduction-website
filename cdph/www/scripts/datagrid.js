@@ -283,18 +283,48 @@ function loadData(dataArr, type, taxoniumURL = '') {
     console.log('finished adding sample data to grid');
   }
   setGridView();
+
+  if (basicDataLoaded && sampleDataLoaded) {
+    const loadingOverlay = document.getElementById('loading_overlay');
+    loadingOverlay.style.display = 'none';
+  }
+
   // enable custom tool tips
   $(document).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
   });
-} // end of loadData function
+}
+
+// Fetch with retry and exponential backoff. Returns a response object
+async function fetchWithRetry(url, attempts = 3) {
+  // Delay in ms
+  let delay = 500;
+
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const response = await fetch(url);
+
+      if (response.ok) {
+        return response;
+      }
+    } catch (error) {
+      console.error(`Attempt ${attempt} failed: ${error.message}`);
+    }
+
+    // Exponential backoff
+    await new Promise(resolve => setTimeout(resolve, delay *= i));
+  }
+
+  alert('Unexpected network error. Please refresh.');
+}
+
 async function loadBasicData(dataHost, taxoniumURL, file) {
   const workerBlob = new Blob([workerScript], {type: 'application/javascript'});
   const workerUrl = URL.createObjectURL(workerBlob);
 
   const worker = new Worker(workerUrl);
 
-  const compressedBlob1 = await fetch(dataHost + file + '?v=' + new Date().getTime())
+  const compressedBlob1 = await fetchWithRetry(dataHost + file + '?v=' + new Date().getTime())
       .then((r) => r.blob());
 
   worker.onmessage = ({data}) => {
@@ -309,7 +339,7 @@ async function loadSampleData(dataHost, file) {
   const workerUrl = URL.createObjectURL(workerBlob);
   const worker = new Worker(workerUrl);
 
-  const compressedBlob2 = await fetch(dataHost + file + '?v=' + new Date().getTime())
+  const compressedBlob2 = await fetchWithRetry(dataHost + file + '?v=' + new Date().getTime())
       .then((r) => r.blob());
 
   worker.onmessage = ({data}) => {
