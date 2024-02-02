@@ -1,5 +1,9 @@
 # Changelog
 
+## v.0.9.4 (2024-1-31):
+   - Display loader until all data is loaded.
+   - Modify server configuration to turn off caching.
+   - Added retry mechanism with exponential backoff for network requests.
 ## v.0.9.3 (2024-1-9):
    - Display date the dataset was last updated.
 ## v.0.9.2 (2023-12-4):
