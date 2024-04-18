@@ -284,6 +284,7 @@ function loadData(dataArr, type, taxoniumURL = '') {
   }
   setGridView();
 
+  // Hide loader
   if (basicDataLoaded && sampleDataLoaded) {
     const loadingOverlay = document.getElementById('loading_overlay');
     loadingOverlay.style.display = 'none';

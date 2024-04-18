@@ -1,5 +1,9 @@
 # Changelog
 
+## v.0.9.5 (2024-4-18):
+   - Display loader until all data is loaded when switching between state/county view.
+   - Fixed a bug that prevented users from dragging the map when switching tabs.
+   - Update leaflet to the latest version.
 ## v.0.9.4 (2024-1-31):
    - Display loader until all data is loaded.
    - Modify server configuration to turn off caching.

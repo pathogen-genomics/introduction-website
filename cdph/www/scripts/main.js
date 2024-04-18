@@ -23,6 +23,27 @@ for (j = 0; j < 2; j++) {
     }
 }
 
+/* 
+Re-enable dragging on leaflet map when it's clicked.
+Solves an issue where you move your mouse outside of the DOM
+and back into it, then it doesn't let you drag the lab.
+This is due to the leaflet-gesture-handling library.
+*/ 
+window.addEventListener('DOMContentLoaded', () => {
+    const mapDiv = document.getElementById('mapid');
+    if (mapDiv) {
+        mapDiv.addEventListener('click', () => {
+            console.log('test');
+            map.dragging.enable();
+            map.scrollWheelZoom.enable();
+            if (map.tap) {
+                map.tap.enable();
+            }
+        });
+    } else {
+      console.error("Element with ID 'mapid' not found.");
+    }
+});
 
 function maxClusterCt(region_id,timel,map_layer) {
     let maxn = 0;
@@ -296,6 +317,10 @@ function changeScale() {
 }
 
 function swap_countystate() {
+    // Show loader
+    const loadingOverlay = document.getElementById('loading_overlay');
+    loadingOverlay.style.display = 'flex';
+
     var btn = document.getElementById('btn_SC');
     color_scale = 'log';
     global_state = 'default';
