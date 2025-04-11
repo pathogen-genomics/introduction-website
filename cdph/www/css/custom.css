@@ -359,3 +359,49 @@ label {
     border: 1px solid #757575;
     border-radius: 4px;
 }
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000; /* Ensures it appears above the map */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5); /* Adds a semi-transparent background */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 300px;
+  border-radius: 8px;
+  text-align: center;
+  z-index: 1001; /* Additional z-index for the modal content */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.close:hover, .close:focus {
+  color: black;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.close:hover, .close:focus {
+  color: black;
+}
+

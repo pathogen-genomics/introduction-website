@@ -9,3 +9,4 @@
 **/cluster_labels.tsv
 **/.DS_Store
 **/__pycache__
+.env
