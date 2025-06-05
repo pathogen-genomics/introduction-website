@@ -33,7 +33,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const mapDiv = document.getElementById('mapid');
     if (mapDiv) {
         mapDiv.addEventListener('click', () => {
-            console.log('test');
             map.dragging.enable();
             map.scrollWheelZoom.enable();
             if (map.tap) {
@@ -453,9 +452,36 @@ function onEachFeature(feature, layer) {
     layer.on({
         mouseover: highlightFeature,
         mouseout: resetHighlight,
-        click: changeView
+        click: function (e) {
+            changeView(e);
+
+            // Get county-specific data
+            const countyName = feature.properties.name;
+            const introData = feature.properties.intros[global_time + 'basecount'];
+
+            // Pop-up content with a subscribe button
+            const popupContent = `<strong>County:</strong> ${countyName}<br>
+                                  <strong>Introductions:</strong> ${introData}<br><br>
+                                  <button onclick="openSubscribeModal()">Subscribe</button>`;
+            
+            // Open the popup at the click location
+            layer.bindPopup(popupContent).openPopup();
+        }
     });
 }
+
+// Function to open the subscribe modal
+function openSubscribeModal() {
+    const modal = document.getElementById("subscribeModal");
+    modal.style.display = "block";
+}
+
+// Function to close the subscribe modal
+function closeSubscribeModal() {
+    const modal = document.getElementById("subscribeModal");
+    modal.style.display = "none";
+}
+
 
 info.addTo(map);
 legend.addTo(map);
