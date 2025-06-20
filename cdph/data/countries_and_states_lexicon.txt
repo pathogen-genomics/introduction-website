@@ -1,0 +1,329 @@
+Tijuana International Airport,CBX
+Los Angeles International Airport,LAX
+San Francisco International Airport,SFO
+John Wayne Airport,SNA
+Alameda County,Alameda
+Alpine County,Alpine
+Amador County,Amador
+Butte County,Butte
+Calaveras County,Calaveras
+Colusa County,Colusa
+Contra Costa County,Contra Costa
+Del Norte County,Del Norte
+El Dorado County,El Dorado
+Fresno County,Fresno
+Glenn County,Glenn
+Humboldt County,Humboldt
+Imperial County,Imperial
+Inyo County,Inyo
+Kern County,Kern
+Kings County,Kings
+Lake County,Lake
+Lassen County,Lassen
+Los Angeles County,Los Angeles
+Madera County,Madera
+Marin County,Marin
+Mariposa County,Mariposa
+Mendocino County,Mendocino
+Merced County,Merced
+Modoc County,Modoc
+Mono County,Mono
+Monterey County,Monterey
+Napa County,Napa
+Nevada County,Nevada
+Orange County,Orange
+Placer County,Placer
+Plumas County,Plumas
+Riverside County,Riverside
+Sacramento County,Sacramento
+San Benito County,San Benito
+San Bernardino County,San Bernardino
+San Diego County,San Diego
+San Francisco County,San Francisco
+San Joaquin County,San Joaquin
+San Luis Obispo County,San Luis Obispo
+San Mateo County,San Mateo
+Santa Barbara County,Santa Barbara
+Santa Clara County,Santa Clara
+Santa Cruz County,Santa Cruz
+Shasta County,Shasta
+Sierra County,Sierra
+Siskiyou County,Siskiyou
+Solano County,Solano
+Sonoma County,Sonoma
+Stanislaus County,Stanislaus
+Sutter County,Sutter
+Tehama County,Tehama
+Trinity County,Trinity
+Tulare County,Tulare
+Tuolumne County,Tuolumne
+Ventura County,Ventura
+Yolo County,Yolo
+Yuba County,Yuba
+Alabama,AL
+Alaska,AK
+Arkansas,AR
+Arizona,AZ
+California,CA
+Colorado,CO
+Connecticut,CT
+Delaware,DE
+District of Columbia,DC
+Florida,FL
+Georgia,GA
+Hawaii,HI
+Idaho,ID
+Illinois,IL
+Indiana,IN
+Iowa,IA
+Kansas,KS
+Kentucky,KY
+Louisiana,LA
+Maine,ME
+Maryland,MD
+Massachusetts,MA
+Michigan,MI
+Minnesota,MN
+Mississippi,MS
+Missouri,MO
+Montana,MT
+Nebraska,NE
+Nevada,NV
+New Hampshire,NH
+New Jersey,NJ
+New Mexico,NM
+New York,NY
+North Carolina,NC
+North Dakota,ND
+Ohio,OH
+Oklahoma,OK
+Oregon,OR
+Pennsylvania,PA
+Puerto Rico,PR
+Rhode Island,RI
+South Carolina,SC
+South Dakota,SD
+Tennessee,TN
+Texas,TX
+Utah,UT
+Vermont,VT
+Virginia,VA
+Washington,WA
+West Virginia,WV
+Wisconsin,WI
+Wyoming,WY
+Puerto Rico,PR
+Afghanistan,AFG
+Albania,ALB
+Algeria,DZA
+Andorra,AND
+Angola,AGO
+Antigua and Barbuda,ATG
+Argentina,ARG
+Armenia,ARM
+Australia,AUS
+Austria,AUT
+Azerbaijan,AZE
+Bahamas,BHS
+Bahrain,BHR
+Bangladesh,BGD
+Barbados,BRB
+Belarus,BLR
+Belgium,BEL
+Belize,BLZ
+Benin,BEN
+Bermuda,BMU
+Bhutan,BTN
+Bolivia,BOL
+Bosnia and Herzegovina,BIH
+Botswana,BWA
+Brazil,BRA
+Brunei,BRN
+Bulgaria,BGR
+Burkina Faso,BFA
+Burundi,BDI
+Cambodia,KHM
+Cameroon,CMR
+Canada,CAN
+Cape Verde,CPV
+Central African Republic,CAF
+Chad,TCD
+Chile,CHL
+China,CHN
+Colombia,COL
+Comoros,COM
+Congo,COG
+Cook Islands,COK
+Costa Rica,CRI
+Croatia,HRV
+Cuba,CUB
+Cyprus,CYP
+Czech Republic,CZE
+Democratic Republic of the Congo,COD
+Denmark,DNK
+Djibouti,DJI
+Dominica,DMA
+Dominican Republic,DOM
+East Timor,TLS
+Ecuador,ECU
+Egypt,EGY
+El Salvador,SLV
+Equatorial Guinea,GNQ
+Eritrea,ERI
+Estonia,EST
+Eswatini,SWZ
+Ethiopia,ETH
+Fiji,FJI
+Finland,FIN
+France,FRA
+Gabon,GAB
+Gambia,GMB
+Georgia,GEO
+Germany,DEU
+Ghana,GHA
+Greece,GRC
+Greenland,GRL
+Grenada,GRD
+Guatemala,GTM
+Guinea,GIN
+Guinea-Bissau,GNB
+Guyana,GUY
+Haiti,HTI
+Honduras,HND
+Hungary,HUN
+Iceland,ISL
+India,IND
+Indonesia,IDN
+Iran,IRN
+Iraq,IRQ
+Ireland,IRL
+Israel,ISR
+Italy,ITA
+Ivory Coast,CIV
+Jamaica,JAM
+Japan,JPN
+Jordan,JOR
+Kazakhstan,KAZ
+Kenya,KEN
+Kiribati,KIR
+Kuwait,KWT
+Kyrgyzstan,KGZ
+Laos,LAO
+Latvia,LVA
+Lebanon,LBN
+Lesotho,LSO
+Liberia,LBR
+Libya,LBY
+Lithuania,LTU
+Luxembourg,LUX
+Madagascar,MDG
+Malawi,MWI
+Malaysia,MYS
+Maldives,MDV
+Mali,MLI
+Malta,MLT
+Marshall Islands,MHL
+Mauritania,MRT
+Mauritius,MUS
+Mexico,MEX
+Micronesia,FSM
+Moldova,MDA
+Monaco,MCO
+Mongolia,MNG
+Montenegro,MNE
+Morocco,MAR
+Mozambique,MOZ
+Myanmar,MMR
+Namibia,NAM
+Nauru,NRU
+Nepal,NPL
+Netherlands,NLD
+New Zealand,NZL
+Nicaragua,NIC
+Niger,NER
+Nigeria,NGA
+North Korea,PRK
+North Macedonia,MKD
+Norway,NOR
+Oman,OMN
+Pakistan,PAK
+Palau,PLW
+Palestinian Territory,PSE
+Panama,PAN
+Papua New Guinea,PNG
+Paraguay,PRY
+Peru,PER
+Philippines,PHL
+Poland,POL
+Portugal,PRT
+Qatar,QAT
+Romania,ROU
+Russia,RUS
+Rwanda,RWA
+Saint Kitts and Nevis,KNA
+Saint Lucia,LCA
+Saint Vincent and the Grenadines,VCT
+Samoa,WSM
+San Marino,SMR
+Sao Tome and Principe,STP
+Saudi Arabia,SAU
+Senegal,SEN
+Serbia,SRB
+Seychelles,SYC
+Sierra Leone,SLE
+Singapore,SGP
+Slovakia,SVK
+Slovenia,SVN
+Solomon Islands,SLB
+Somalia,SOM
+South Africa,ZAF
+South Korea,KOR
+South Sudan,SSD
+Spain,ESP
+Sri Lanka,LKA
+Sudan,SDN
+Suriname,SUR
+Sweden,SWE
+Switzerland,CHE
+Syria,SYR
+Taiwan,TWN
+Tajikistan,TJK
+Tanzania,TZA
+Thailand,THA
+Togo,TGO
+Tonga,TON
+Trinidad and Tobago,TTO
+Tunisia,TUN
+Turkey,TUR
+Turkmenistan,TKM
+Tuvalu,TUV
+Uganda,UGA
+Ukraine,UKR
+United Arab Emirates,ARE
+United Kingdom,GBR
+Uruguay,URY
+Uzbekistan,UZB
+Vanuatu,VUT
+Vatican City,VAT
+Venezuela,VEN
+Vietnam,VNM
+Yemen,YEM
+Zambia,ZMB
+Zimbabwe,ZWE
+UK,GBR
+USA,USA
+United States,USA
+United States of America,USA
+Czechia,CZE
+Macedonia,MKD
+Timor-Leste,TLS
+Cote d'Ivoire,CIV
+Swaziland,SWZ
+Burma,MMR
+Korea,KOR
+Democratic People's Republic of Korea,PRK
+Republic of Korea,KOR
+Russian Federation,RUS
+The Netherlands,NLD
+Holland,NLD
+The Gambia,GMB

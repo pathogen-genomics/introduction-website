@@ -84,7 +84,7 @@ fetch('/get-sensitive-data')
             }
 
             // 1. Check if user exists, if not, create a new user
-            const usersRef = collection(db, "users");
+            const usersRef = collection(db, "users-tb");
             const userQuery = query(usersRef, where("email", "==", email));
             const userSnapshot = await getDocs(userQuery);
 
@@ -104,7 +104,7 @@ fetch('/get-sensitive-data')
 
             for (const eventType of eventTypes) {
                 // 2. Check if event exists, if not, create it
-                const eventsRef = collection(db, "events");
+                const eventsRef = collection(db, "events-tb");
                 const eventQuery = query(eventsRef, where("eventType", "==", eventType), where("location", "==", location));
                 const eventSnapshot = await getDocs(eventQuery);
 
@@ -124,7 +124,7 @@ fetch('/get-sensitive-data')
                 console.log("Event ID:", eventId);
 
                 // 3. Check if subscription exists, if not, create it
-                const subscriptionsRef = collection(db, "subscriptions");
+                const subscriptionsRef = collection(db, "subscriptions-tb");
                 const subscriptionQuery = query(subscriptionsRef, where("userId", "==", userId), where("eventId", "==", eventId));
                 const subscriptionSnapshot = await getDocs(subscriptionQuery);
                 

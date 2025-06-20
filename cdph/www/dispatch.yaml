@@ -1,15 +1,15 @@
 dispatch:
   #static training site; need to put above geneneral site
-  - url: "clustertracker.big-tree.ucsc.edu/training*"
-    service: cluster-tracker-training
-  - url: "cluster-tracker.big-tree.ucsc.edu/training*"
-    service: cluster-tracker-training
+  # - url: "clustertracker.big-tree.ucsc.edu/training*"
+  #   service: cluster-tracker-training
+  # - url: "cluster-tracker.big-tree.ucsc.edu/training*"
+  #   service: cluster-tracker-training
   #Production Big Tree Cluster Tracker
-  - url: "clustertracker.big-tree.ucsc.edu/*"
+  - url: "tb-clustertracker.big-tree.ucsc.edu/*"
     service: cluster-tracker
-  - url: "www.clustertracker.big-tree.ucsc.edu/*"
-    service: cluster-tracker
-  - url: "cluster-tracker.big-tree.ucsc.edu/*"
-    service: cluster-tracker
-  - url: "www.cluster-tracker.big-tree.ucsc.edu/*"
-    service: cluster-tracker
+  - url: "www.tb-clustertracker.big-tree.ucsc.edu/*"
+    service: tbcluster-tracker
+  - url: "tb-cluster-tracker.big-tree.ucsc.edu/*"
+    service: tb-cluster-tracker
+  - url: "www.tb-cluster-tracker.big-tree.ucsc.edu/*"
+    service: tb-cluster-tracker

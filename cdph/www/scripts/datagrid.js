@@ -28,13 +28,13 @@ let filterArgs = { // grid filter arguments
     sampcount: true,
     earliest: true,
     latest: true,
-    clade: true,
+    // clade: true,
     lineage: true,
     origin: true,
     confidence: true,
     growth: true,
     samples: true,
-    pauis: true,
+    // pauis: true,
   },
   gridFilters: {
     minGrowth: '',
@@ -112,8 +112,8 @@ function blankSampleObj() {
   el = {
     'samples': '',
     'samplecol': '...loading data...',
-    'pauis': '',
-    'pauicol': '...loading data...',
+    // 'pauis': '',             // TB data doesn't have PAUIDs
+    // 'pauicol': '...loading data...',  // TB data doesn't have PAUIDs
   };
   return el;
 }
@@ -135,12 +135,15 @@ function blankClusterObj() {
   return el;
 }
 // File name extension for CDPH County vs State visualization
+// TODO: Restore dual-layer functionality for counties/states in the future
 function getFNameExtn() {
   let ext = '';
+  // For TB world data, we only have one dataset, so no extension needed
+  // TODO: Restore this logic when adding counties back:
   // eslint-disable-next-line camelcase
-  if (map_layer == 1) {
-    ext = '_us';
-  }
+  // if (map_layer == 1) {
+  //   ext = '_us';
+  // }
   return ext;
 }
 function getTaxoniumLink(taxoniumURL, cluster, ext = '') {
@@ -158,39 +161,41 @@ function getTaxoniumLink(taxoniumURL, cluster, ext = '') {
   link += '&zoomToSearch=0" target="_blank">View Cluster</a>';
   return link;
 }
-function getInvetigatorLink(cluster, nPauis, ext = '') {
-  let link = '<a href="https://investigator.big-tree.ucsc.edu?';
-  link += 'file=cluster_pids' + getFNameExtn() + '.json';
-  link += '&cid=' + cluster;
-  link += '" target="_blank">View ' + nPauis + ' Samples</a>';
-  return link;
-}
+// function getInvetigatorLink(cluster, nPauis, ext = '') {
+//   let link = '<a href="https://investigator.big-tree.ucsc.edu?';
+//   link += 'file=cluster_pids' + getFNameExtn() + '.json';
+//   link += '&cid=' + cluster;
+//   link += '" target="_blank">View ' + nPauis + ' Samples</a>';
+//   return link;
+// }
+// function clusterObjs(items, taxoniumURL, ext = '') {
 function clusterObjs(items, taxoniumURL, ext = '') {
-  if (items[10] === 0) {
-    items[10] = 'No identifiable samples';
-  } else {
-    items[10] = getInvetigatorLink(items[0].toString(), items[10].toString(), ext);
-  }
+  // if (items[10] === 0) {
+  //   items[10] = 'No identifiable samples';
+  // } else {
+  //   items[10] = getInvetigatorLink(items[0].toString(), items[10].toString(), ext);
+  // }
   el = {
     'cid': items[0],
     'region': items[1].replace(/_/g, ' '),
     'sampcount': items[2].toString(),
     'earliest': items[3],
     'latest': items[4],
-    'clade': items[5],
-    'lineage': items[6],
-    'origin': items[7].replace(/_/g, ' '),
-    'confidence': items[8].toString(),
-    'growth': items[9].toString(),
+    // 'clade': items[5],
+    'lineage': items[5],
+    'origin': items[6].replace(/_/g, ' '),
+    'confidence': items[7].toString(),
+    'growth': items[8].toString(),
     'taxlink': getTaxoniumLink(taxoniumURL, items[0], ext),
-    'investigator': items[10],
+    // 'investigator': items[10],
   };
   return el;
 }
 function sampleObjs(items) {
   // full values for searching
-  const s = items[0];
-  const p = items[1];
+  // TB data format: items is an array with only sample ID, e.g., ["SAMEA5542064"]
+  const s = items[0] || '';  // sample ID
+  const p = '';              // no PAUIDs in TB data
   // truncated values for display
   let st = '';
   let pt = '';
@@ -198,15 +203,15 @@ function sampleObjs(items) {
     const n = s.length <= 50 ? s.length - 1 : 50;
     st = s.slice(0, n) + '...';
   }
-  if (p !== '') {
-    const n = p.length <= 50 ? p.length - 1 : 50;
-    pt = p.slice(0, n) + '...';
-  }
+  // if (p !== '') {
+  //   const n = p.length <= 50 ? p.length - 1 : 50;
+  //   pt = p.slice(0, n) + '...';
+  // }
   el = {
     'samples': s,
-    'pauis': p,
+    // 'pauis': p,
     'samplecol': st,
-    'pauicol': pt,
+    // 'pauicol': pt,
   };
   return el;
 }
@@ -235,27 +240,28 @@ function appendData(items, type, taxoniumURL = '') {
     for (let i = 0; i < sl; i++) {
       const newData = sampleObjs(items[i]);
       data[i].samples = newData.samples;
-      data[i].pauis = newData.pauis;
+      // data[i].pauis = newData.pauis;  // TB data doesn't have PAUIDs
       data[i].samplecol = newData.samplecol;
-      data[i].pauicol = newData.pauicol;
+      // data[i].pauicol = newData.pauicol;  // TB data doesn't have PAUIDs
     }
   } else if (type === 'clusters') {
-    const newData = clusterObjs(items[i], taxoniumURL);
-    data[i].cid = newData.cid;
-    data[i].region = newData.region;
-    data[i].sampcount = newData.sampcount;
-    data[i].earliest = newData.earliest;
-    data[i].latest = newData.latest;
-    data[i].clade= newData.clade;
-    data[i].lineage = newData.lineage;
-    data[i].origin = newData.origin;
-    data[i].confidence = newData.confidence;
-    data[i].growth = newData.growth;
-    data[i].taxlink = newData.taxlink;
-    data[i].investigator = newData.investigator;
+    for (let i = 0; i < sl; i++) {
+      const newData = clusterObjs(items[i], taxoniumURL);
+      data[i].cid = newData.cid;
+      data[i].region = newData.region;
+      data[i].sampcount = newData.sampcount;
+      data[i].earliest = newData.earliest;
+      data[i].latest = newData.latest;
+      // data[i].clade= newData.clade;
+      data[i].lineage = newData.lineage;
+      data[i].origin = newData.origin;
+      data[i].confidence = newData.confidence;
+      data[i].growth = newData.growth;
+      data[i].taxlink = newData.taxlink;
+      // data[i].investigator = newData.investigator;
+    }
   }
 }
-// function to load the data and wire functions to table
 function loadData(dataArr, type, taxoniumURL = '') {
   if (type === 'clusters') {
     if (!sampleDataLoaded) {
@@ -309,11 +315,11 @@ async function fetchWithRetry(url, attempts = 3) {
         return response;
       }
     } catch (error) {
-      console.error(`Attempt ${attempt} failed: ${error.message}`);
+      console.error(`Attempt ${i + 1} failed: ${error.message}`);
     }
 
     // Exponential backoff
-    await new Promise(resolve => setTimeout(resolve, delay *= i));
+    await new Promise(resolve => setTimeout(resolve, delay *= (i + 1)));
   }
 
   alert('Unexpected network error. Please refresh.');
@@ -369,15 +375,15 @@ function setCols() {
     {id: 'sampcount', name: `<span data-toggle='tooltip' title='${tooltipText[2]}'>Sample Count</span>`, field: 'sampcount', minWidth: 50, sortable: true, sorter: sorterNumeric, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
     {id: 'earliest', name: `<span data-toggle='tooltip' title='${tooltipText[3]}'>Earliest Date</span>`, field: 'earliest', minWidth: 70, sortable: true, sorter: sorterDates, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
     {id: 'latest', name: `<span data-toggle='tooltip' title='${tooltipText[4]}'>Latest Date</span>`, field: 'latest', minWidth: 70, sortable: true, sorter: sorterDates, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
-    {id: 'clade', name: `<span data-toggle='tooltip' title='${tooltipText[5]}'>Clade</span>`, field: 'clade', minWidth: 80, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
-    {id: 'lineage', name: `<span data-toggle='tooltip' title='${tooltipText[6]}'>Lineage</span>`, field: 'lineage', minWidth: 80, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
-    {id: 'origin', name: `<span data-toggle='tooltip' title='${tooltipText[7]}'>Best Potential Origins</span>`, field: 'origin', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
-    {id: 'confidence', name: `<span data-toggle='tooltip' title='${tooltipText[8]}'>Best Origin Regional Indices</span>`, field: 'confidence', minWidth: 75, sortable: true, sorter: sorterNumeric, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
-    {id: 'growth', name: `<span data-toggle='tooltip' title='${tooltipText[9]}'>Growth Score</span>`, field: 'growth', minWidth: 70, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
+    // {id: 'clade', name: `<span data-toggle='tooltip' title='${tooltipText[5]}'>Clade</span>`, field: 'clade', minWidth: 80, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
+    {id: 'lineage', name: `<span data-toggle='tooltip' title='${tooltipText[5]}'>Lineage</span>`, field: 'lineage', minWidth: 80, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
+    {id: 'origin', name: `<span data-toggle='tooltip' title='${tooltipText[6]}'>Best Potential Origins</span>`, field: 'origin', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
+    {id: 'confidence', name: `<span data-toggle='tooltip' title='${tooltipText[7]}'>Best Origin Regional Indices</span>`, field: 'confidence', minWidth: 75, sortable: true, sorter: sorterNumeric, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
+    {id: 'growth', name: `<span data-toggle='tooltip' title='${tooltipText[8]}'>Growth Score</span>`, field: 'growth', minWidth: 70, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
     {id: 'taxlink', name: `<span data-toggle='tooltip' title='${tooltipText[10]}'>View in Taxonium</span>`, field: 'taxlink', minWidth: 70, formatter: linkFormatter, sortable: true, sorter: sorterStringCompare},
-    {id: 'investigator', name: `<span data-toggle='tooltip' title='${tooltipText[11]}'>View in Big Tree Investigator</span>`, field: 'investigator', minWidth: 120, formatter: linkFormatter, sortable: true, sorter: sorterStringCompare},
-    {id: 'samplecol', name: `<span data-toggle='tooltip' title='${tooltipText[12]}'>Samples</span>`, field: 'samplecol', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
-    {id: 'pauicol', name: `<span data-toggle='tooltip' title='${tooltipText[13]}'>Specimen IDs</span>`, field: 'pauicol', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
+    // {id: 'investigator', name: `<span data-toggle='tooltip' title='${tooltipText[11]}'>View in Big Tree Investigator</span>`, field: 'investigator', minWidth: 120, formatter: linkFormatter, sortable: true, sorter: sorterStringCompare},
+    {id: 'samplecol', name: `<span data-toggle='tooltip' title='${tooltipText[9]}'>Samples</span>`, field: 'samplecol', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
+    // {id: 'pauicol', name: `<span data-toggle='tooltip' title='${tooltipText[13]}'>Specimen IDs</span>`, field: 'pauicol', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
   ];
   return cols;
 }
@@ -399,18 +405,15 @@ function linkFormatter(row, cell, value, columnDef, dataContext) {
 const tooltipText = [
   'The identifier of the internal node inferred to be the ancestral introduction. Can be used with the public protobuf and matUtils.',
   'Region of this cluster.',
-  'Number of samples in this cluster.',
+  'Number of tuberculosis samples in this cluster.',
   'Date of the earliest sample from this cluster.',
   'Date of the latest sample from this cluster.',
-  'Nextstrain clade of the ancestral introduction.',
-  'Pangolin lineage of the ancestral introduction.',
+  'Lineage classification of the ancestral introduction.',
   'The origin region with the greatest index value. May not be the true origin, especially if the corresponding index value is below 0.5.',
   'Regional index for the origin; 1 is maximal, 0 is minimal.',
   'Importance estimate based on cluster size and age. Not directly comparable between regions with varying sequencing levels.',
-  'Click to View in Taxonium',
-  'Click to View in California Big Tree Investigator',
-  'Double click cell to view all samples in this cluster',
-  'Double click cell to view all CDPH Specimen IDs or Accession Numbers for this cluster',
+  'Double click cell to view all tuberculosis samples in this cluster',
+  'Click to view cluster in Taxonium phylogenetic tree viewer',
 ];
 function tooltipFormatter(row, cell, value, column, dataContext) {
   let val = '';
@@ -498,7 +501,7 @@ function doSearch() {
     let validVals = true;
     let searchAdvancedFlag = false;
     let onlyValidDates = false;
-    const gridFilters = {
+    let gridFilters = {
       minGrowth: document.getElementById('txtGrowthMin').value.trim(),
       maxGrowth: document.getElementById('txtGrowthMax').value.trim(),
       minDate: document.getElementById('txtDateMin').value.trim(),
