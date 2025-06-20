@@ -154,7 +154,7 @@ def generate_display_tables(extension = [''], isWDL = False):
         txt_data = "["
         txt_samples = "["
         for i, d in enumerate(cluster_data):
-            outline_data = [addq(d['cluster_id']), addq(d['region']), d['sample_count'], addq(d['earliest_date']), addq(d['latest_date']), addq(d['annotation_1']), addq(d['annotation_2']), addq(d['inferred_origin']), addq(d['inferred_origin_confidence']), addq(d['asterisk'])]
+            outline_data = [addq(d['cluster_id']), addq(d['region']), d['sample_count'], addq(d['earliest_date']), addq(d['latest_date']), addq(d['annotation_1']), addq(d['inferred_origin']), addq(d['inferred_origin_confidence']), addq(d['asterisk'])]
             outline_samples = [addq(d['samples'])]
             if is_custom:
                 # get the number of PAUIS

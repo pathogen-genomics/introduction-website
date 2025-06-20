@@ -1,17 +1,20 @@
   {
     "enable_ns_download": true,
     "source": "INSDC",
-    "title": "California Big Tree",
+    "title": "Tuberculosis Big Tree",
     "customNames": {
-      "meta_cluster": "Cluster ID, CA County Analysis",
-      "meta_cluster2": "Cluster ID, CA State Analysis",
-      "meta_region": "Region, CA County Analysis",
-      "meta_region2": "Region, CA State Analysis",
+      "meta_cluster": "Cluster ID",
+      "meta_region": "Region",
       "num_tips": "Descendant sequences",
       "meta_specimen_id": "Specimen ID",
-      "meta_pango_lineage": "PANGO lineage",
-      "meta_nextstrain_clade": "Nextstrain clade",
-      "meta_gisaid_accession": "GISAID accession"
+      "meta_lineage": "Lineage",
+      "meta_tbprof_sublin": "Sublineage",
+      "meta_tbprofiler_lineage_usher": "TB Profiler Lineage",
+      "meta_date": "Collection Date",
+      "meta_tbprof_drtype": "Drug Resistance",
+      "meta_organism": "Species",
+      "meta_host": "Host Organism",
+      "meta_country": "Country"
     },
     "name_accessor": "name",
     "covspectrum_links": true,
@@ -19,52 +22,35 @@
     "defaultColorByField": "meta_region",
     "keys_to_display": [
       "genotype",
-      "meta_date",
-      "meta_pango_lineage",
+      "meta_lineage",
       "meta_nextstrain_clade",
       "meta_cluster",
       "meta_region",
-      "meta_cluster2",
-      "meta_region2",
-      "meta_county",
-      "meta_genbank_accession",
-      "meta_gisaid_accession",
       "meta_specimen_id",
-      "meta_specimen_accession_number",
-      "meta_sequencing_lab",
-      "meta_country"
+      "meta_country",
+      "meta_tbprof_sublin",
+      "meta_tbprofiler_lineage_usher",
+      "meta_date",
+      "meta_tbprof_drtype",
+      "meta_organism",
+      "meta_host"
     ],
-    "overlay": "Welcome to the California Big Tree.",
+    "overlay": "Welcome to the Tuberculosis Big Tree.",
     "search_types": [
       { "name": "name", "label": "Name", "type": "text_match" },
-      { "name": "meta_cluster", "label": "Cluster ID, CA County Analysis", "type": "text_exact" },
-      { "name": "meta_region", "label": "Region, CA County Analysis", "type": "text_match" },
-      { "name": "meta_cluster2", "label": "Cluster ID, CA State Analysis", "type": "text_exact" },
-      { "name": "meta_region2", "label": "Region, CA State Analysis", "type": "text_match" },
-      { "name": "meta_county", "label": "County", "type": "text_match" },
+      { "name": "meta_cluster", "label": "Cluster ID", "type": "text_exact" },
+      { "name": "meta_region", "label": "Region", "type": "text_match" },
       {
-        "name": "meta_pango_lineage",
-        "label": "PANGO lineage",
+        "name": "meta_lineage",
+        "label": "Lineage",
         "type": "text_exact"
       },
-      {
-        "name": "meta_nextstrain_clade",
-        "label": "Nextstrain clade",
-        "type": "text_exact"
-      },
-      {
-        "name": "meta_genbank_accession",
-        "label": "Genbank accession",
-        "type": "text_per_line"
-      },
-      {
-        "name": "meta_gisaid_accession",
-        "label": "GISAID accession",
-        "type": "text_per_line"
-      },
-      { "name": "meta_specimen_accession_number", "label": "Specimen accession number", "type": "text_per_line" },
-      { "name": "meta_sequencing_lab", "label": "Sequencing lab", "type": "text_match" },
+      { "name": "meta_tbprof_sublin", "label": "Sublineage", "type": "text_match" },
+      { "name": "meta_tbprofiler_lineage_usher", "label": "TB Profiler Lineage", "type": "text_match" },
+      { "name": "meta_tbprof_drtype", "label": "Drug Resistance", "type": "text_match" },
+      { "name": "meta_organism", "label": "Species", "type": "text_match" },
       { "name": "meta_country", "label": "Country", "type": "text_match" },
+      { "name": "meta_host", "label": "Host Organism", "type": "text_match" },
       { "name": "mutation", "label": "Mutation", "type": "mutation" },
       { "name": "genotype", "label": "Genotype", "type": "genotype" },
       { "name": "revertant", "label": "Revertant", "type": "revertant" },
@@ -74,12 +60,12 @@
     "colorBy": {
       "colorByOptions": [
         "meta_region",
-        "meta_region2",
         "meta_county",
-        "meta_pango_lineage",
-        "meta_nextstrain_clade",
+        "meta_lineage",
         "meta_country",
         "genotype",
+        "meta_host",
+        "meta_tbprof_drtype",
         "None"
       ]
     },
