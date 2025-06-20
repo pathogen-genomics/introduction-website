@@ -85,7 +85,7 @@ fetch('/get-sensitive-data')
 
             // 1. Check if user exists, if not, create a new user
             const usersRef = collection(db, "users-tb");
-            const userQuery = query(usersRef, where("email-tb", "==", email));
+            const userQuery = query(usersRef, where("email", "==", email));
             const userSnapshot = await getDocs(userQuery);
 
             let userId;
