@@ -1,25 +1,48 @@
-const map = L.map('mapid', {'tap': false, 'gestureHandling': true}).setView(L.latLng(mapCenter), mapInitialZoom);
-// set max zoomed out extent via bounds and minZoom
-const southWest = L.latLng(-90, -179);
-const northEast = L.latLng(90, 0);
-const bounds = L.latLngBounds(southWest, northEast);
-map.setMaxBounds(bounds);
-map.options.minZoom = 2;
+// map leaflet object
+// TODO: Restore California-specific coordinates when adding counties back
+// Original California coordinates: [36.77, -119.418], zoom 5
+const map = L.map('mapid', {
+    'tap': false, 
+    'gestureHandling': true,
+    'worldCopyJump': true,  // Enable world wrap-around
+    'maxBounds': [[-90, -Infinity], [90, Infinity]]  // Only restrict latitude, allow infinite longitude scrolling
+}).setView(L.latLng(mapCenter), mapInitialZoom);
+// set max zoomed out extent via minZoom (bounds now set in map options above)
+// TODO: Restore California bounds when adding counties back
+// Original California bounds: southWest(-90, -179), northEast(90, 0)
+map.options.minZoom = 1;  // Allow zooming out further for world view
 
 let global_state = 'default';
 let global_time = '';
 let global_state_id = '00';
 let map_colors = ['#800026', '#BD0026', '#E31A1C', '#FC4E2A', '#FD8D3C', '#FEB24C', '#FED976', '#FFEDA0'];
 let color_scale = 'log';
-let map_layer = 0; //0=county data, 1=state data
-let alldata =[introData, introData_us];
-let max_basecount = [0,0];
-for (j = 0; j < 2; j++) {
-    for (i = 0; i < alldata[j].features.length; i++) {
-        let bc = alldata[j].features[i]['properties']['intros']['basecount'];
-        if (bc > max_basecount[j]) {
-            max_basecount[j] = bc;
-        }
+let map_layer = 0; // single layer for world data
+
+// Filter out "United States" to show individual US states instead
+const filteredIntroData = {
+    type: introData.type,
+    features: introData.features.filter(feature => 
+        feature.properties.name !== "United States of America"
+    )
+};
+
+// TODO: Restore dual-layer functionality for counties/states in the future
+// let alldata =[introData, introData_us];
+// let max_basecount = [0,0];
+// for (j = 0; j < 2; j++) {
+//     for (i = 0; i < alldata[j].features.length; i++) {
+//         let bc = alldata[j].features[i]['properties']['intros']['basecount'];
+//         if (bc > max_basecount[j]) {
+//             max_basecount[j] = bc;
+//         }
+//     }
+// }
+let max_basecount = 0;
+for (i = 0; i < filteredIntroData.features.length; i++) {
+    let bc = filteredIntroData.features[i]['properties']['intros']['basecount'];
+    if (bc > max_basecount) {
+        max_basecount = bc;
     }
 }
 
@@ -44,11 +67,16 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function maxClusterCt(region_id,timel,map_layer) {
+// TODO: Restore dual-layer functionality
+// function maxClusterCt(region_id,timel,map_layer) {
+function maxClusterCt(region_id,timel) {
     let maxn = 0;
     let item = timel + 'raw' + region_id;
-    for (i = 0; i < alldata[map_layer].features.length; i++) {
-        let c = alldata[map_layer].features[i]['properties']['intros'][item];
+    // TODO: Restore dual-layer functionality
+    // for (i = 0; i < alldata[map_layer].features.length; i++) {
+    //     let c = alldata[map_layer].features[i]['properties']['intros'][item];
+    for (i = 0; i < filteredIntroData.features.length; i++) {
+        let c = filteredIntroData.features[i]['properties']['intros'][item];
         if (c > maxn) {
             maxn = c;
         }
@@ -56,14 +84,23 @@ function maxClusterCt(region_id,timel,map_layer) {
     return maxn;
 }
 
-function getColorBase(d,map_layer) {
-    return d > max_basecount[map_layer] * 0.9 ? map_colors[0] :
-           d > max_basecount[map_layer] * 0.75   ? map_colors[1] :
-           d > max_basecount[map_layer] * 0.5   ? map_colors[2] :
-           d > max_basecount[map_layer] * 0.25   ? map_colors[3] :
-           d > max_basecount[map_layer] * 0.1    ? map_colors[4] :
-           d > max_basecount[map_layer] * 0.05   ? map_colors[5] :
-           d > max_basecount[map_layer] * 0.01    ? map_colors[6] :
+function getColorBase(d) {
+    // TODO: Restore dual-layer functionality
+    // return d > max_basecount[map_layer] * 0.9 ? map_colors[0] :
+    //        d > max_basecount[map_layer] * 0.75   ? map_colors[1] :
+    //        d > max_basecount[map_layer] * 0.5   ? map_colors[2] :
+    //        d > max_basecount[map_layer] * 0.25   ? map_colors[3] :
+    //        d > max_basecount[map_layer] * 0.1    ? map_colors[4] :
+    //        d > max_basecount[map_layer] * 0.05   ? map_colors[5] :
+    //        d > max_basecount[map_layer] * 0.01    ? map_colors[6] :
+    //                   map_colors[7];
+    return d > max_basecount * 0.9 ? map_colors[0] :
+           d > max_basecount * 0.75   ? map_colors[1] :
+           d > max_basecount * 0.5   ? map_colors[2] :
+           d > max_basecount * 0.25   ? map_colors[3] :
+           d > max_basecount * 0.1    ? map_colors[4] :
+           d > max_basecount * 0.05   ? map_colors[5] :
+           d > max_basecount * 0.01    ? map_colors[6] :
                       map_colors[7];
 }
 
@@ -106,7 +143,7 @@ function setTimeLabels(sel) {
     const el3 = document.getElementById('chk_time_6');
     const el4 = document.getElementById('chk_time_3');
     if (sel == 0) {
-        //whole pandemic
+        //all time
         el1.innerHTML = 'check';
         el2.innerHTML = '';
         el3.innerHTML = '';
@@ -134,7 +171,9 @@ function setTimeLabels(sel) {
 
 function style(feature) {
     return {
-        fillColor: getColorBase(feature.properties.intros[global_time + 'basecount'], map_layer),
+        // TODO: Restore dual-layer functionality
+        // fillColor: getColorBase(feature.properties.intros[global_time + 'basecount'], map_layer),
+        fillColor: getColorBase(feature.properties.intros[global_time + 'basecount']),
         weight: 2,
         opacity: 1,
         color: 'white',
@@ -146,16 +185,22 @@ function style(feature) {
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 
-var geojson = [];
-geojson[0] = L.geoJson(alldata[0], {
+// TODO: Restore dual-layer functionality for counties/states
+// var geojson = [];
+// geojson[0] = L.geoJson(alldata[0], {
+//     style: style,
+//     onEachFeature: onEachFeature
+// });
+// map.addLayer(geojson[0]);
+// geojson[1] = L.geoJson(alldata[1], {
+//     style: style,
+//     onEachFeature: onEachFeature
+// });
+var geojson = L.geoJson(filteredIntroData, {
     style: style,
     onEachFeature: onEachFeature
 });
-map.addLayer(geojson[0]);
-geojson[1] = L.geoJson(alldata[1], {
-    style: style,
-    onEachFeature: onEachFeature
-});
+map.addLayer(geojson);
 
 
 //control to display data for each region on hover
@@ -169,7 +214,7 @@ info.onAdd = function (map) {
 
 // method to update the info panel control based on feature properties passed
 info.update = function (props) {
-    deftext = ' - Hover over a county or state';
+    deftext = ' - Hover over a region';
     if (global_state == 'default') {
         // total number of clusters
         str = '<h4># Clusters '
@@ -226,8 +271,12 @@ function resetHighlight(e) {
 }
 
 function resetView(e) {
-    geojson[map_layer].eachLayer(function (layer) {
-        geojson[map_layer].resetStyle(layer);
+    // TODO: Restore dual-layer functionality
+    // geojson[map_layer].eachLayer(function (layer) {
+    //     geojson[map_layer].resetStyle(layer);
+    // });
+    geojson.eachLayer(function (layer) {
+        geojson.resetStyle(layer);
     });
     global_state = 'default';
     global_state_id = '00';
@@ -248,7 +297,9 @@ function changeMap(time) {
         global_time = time + '_';
     }
     if (global_state != 'default') {
-        geojson[map_layer].eachLayer(function (layer) {
+        // TODO: Restore dual-layer functionality
+        // geojson[map_layer].eachLayer(function (layer) {
+        geojson.eachLayer(function (layer) {
             if (layer.feature.id == global_state_id) {
                 layer.setStyle({fillColor: '#1a0080'});
             } else {
@@ -283,16 +334,28 @@ function changeView(e) {
 function colorIntros() {
     if (color_scale == 'raw') {
         //find max number of clusters
-        let maxn = maxClusterCt(global_state_id,global_time,map_layer);
+        let maxn = maxClusterCt(global_state_id,global_time);
         //set colors
-        geojson[map_layer].eachLayer(function (layer) {
+        // TODO: Restore dual-layer functionality
+        // geojson[map_layer].eachLayer(function (layer) {
+        //     if (layer.feature.id != global_state_id) {
+        //         layer.setStyle({fillColor: getColorIntroN(layer.feature.properties.intros[global_time + 'raw' + global_state_id],maxn)});
+        //     }
+        // });
+        geojson.eachLayer(function (layer) {
             if (layer.feature.id != global_state_id) {
                 layer.setStyle({fillColor: getColorIntroN(layer.feature.properties.intros[global_time + 'raw' + global_state_id],maxn)});
             }
         });
     } else {
         //set colors
-        geojson[map_layer].eachLayer(function (layer) {
+        // TODO: Restore dual-layer functionality
+        // geojson[map_layer].eachLayer(function (layer) {
+        //     if (layer.feature.id != global_state_id) {
+        //         layer.setStyle({fillColor: getColorIntro(layer.feature.properties.intros[global_time + global_state_id])});
+        //     }
+        // });
+        geojson.eachLayer(function (layer) {
             if (layer.feature.id != global_state_id) {
                 layer.setStyle({fillColor: getColorIntro(layer.feature.properties.intros[global_time + global_state_id])});
             }
@@ -316,38 +379,44 @@ function changeScale() {
 }
 
 function swap_countystate() {
+    // TODO: Restore dual-layer functionality for counties/states
     // Show loader
-    const loadingOverlay = document.getElementById('loading_overlay');
-    loadingOverlay.style.display = 'flex';
+    // const loadingOverlay = document.getElementById('loading_overlay');
+    // loadingOverlay.style.display = 'flex';
 
-    var btn = document.getElementById('btn_SC');
-    color_scale = 'log';
-    global_state = 'default';
-    global_time = '';
-    setTimeLabels(0);
-    if (btn.innerHTML == 'Show CA State Introductions') {
-        btn.innerHTML = 'Show CA County Introductions';
-        map.removeLayer(geojson[0]);
-        map.addLayer(geojson[1]);
-        map_layer = 1;
-    } else {
-        btn.innerHTML = 'Show CA State Introductions';
-        map.removeLayer(geojson[1]);
-        map.addLayer(geojson[0]);
-        map_layer = 0;
-    }
-    resetView();
-    // load new dataset into grid
-    let df = cDataFile;
-    let ds = cSampleFile;
-    if (map_layer == 1) {
-        const ext = '_us';
-        let pos = cDataFile.length - 8;
-        df = cDataFile.substring(0, pos) + ext + cDataFile.substring(pos);
-        pos = cSampleFile.length - 8;
-        ds = cSampleFile.substring(0, pos) + ext + cSampleFile.substring(pos);
-    }
-    initCTGrid(dataHost, taxoniumHost, df, ds);
+    // var btn = document.getElementById('btn_SC');
+    // color_scale = 'log';
+    // global_state = 'default';
+    // global_time = '';
+    // setTimeLabels(0);
+    // if (btn.innerHTML == 'Show CA State Introductions') {
+    //     btn.innerHTML = 'Show CA County Introductions';
+    //     map.removeLayer(geojson[0]);
+    //     map.addLayer(geojson[1]);
+    //     map_layer = 1;
+    // } else {
+    //     btn.innerHTML = 'Show CA State Introductions';
+    //     map.removeLayer(geojson[1]);
+    //     map.addLayer(geojson[0]);
+    //     map_layer = 0;
+    // }
+    // resetView();
+    // // load new dataset into grid
+    // let df = cDataFile;
+    // let ds = cSampleFile;
+    // if (map_layer == 1) {
+    //     const ext = '_us';
+    //     let pos = cDataFile.length - 8;
+    //     df = cDataFile.substring(0, pos) + ext + cDataFile.substring(pos);
+    //     pos = cSampleFile.length - 8;
+    //     ds = cSampleFile.substring(0, pos) + ext + cSampleFile.substring(pos);
+    // }
+    // initCTGrid(dataHost, taxoniumHost, df, ds);
+    
+    // For TB world data, this function is not needed since we only have one dataset
+    // But keeping the function structure in case it's called from UI
+    console.log('swap_countystate called, but only single world dataset available');
+    return;
 }
 
 var legend = L.control({position: 'bottomleft'});
@@ -411,9 +480,10 @@ function getLegendBins(max) {
     return ltext;
 }
 
-// legend for US clusters
+// legend for world clusters
+// TODO: Restore dual-layer functionality - was: getLegendBins(max_basecount[0])
 const legend_default = '<strong>Number of Clusters</strong><br>' +
-        getLegendBins(max_basecount[0]);
+        getLegendBins(max_basecount);
 // legend for log fold enrichment
 const legend_log = '<strong>Introductions</strong><br>'+
          '<small>Log<sub>10</sub>fold enrichment</small><br>' + 
@@ -455,12 +525,13 @@ function onEachFeature(feature, layer) {
         click: function (e) {
             changeView(e);
 
-            // Get county-specific data
-            const countyName = feature.properties.name;
+            // Get region-specific data
+            // const countyName = feature.properties.name;
+            const regionName = feature.properties.name;
             const introData = feature.properties.intros[global_time + 'basecount'];
 
-            // Pop-up content with a subscribe button
-            const popupContent = `<strong>County:</strong> ${countyName}<br>
+            // Pop-up content with tuberculosis cluster information
+            const popupContent = `<strong>Region:</strong> ${regionName}<br>
                                   <strong>Introductions:</strong> ${introData}<br><br>
                                   <button onclick="openSubscribeModal()">Subscribe</button>`;
             

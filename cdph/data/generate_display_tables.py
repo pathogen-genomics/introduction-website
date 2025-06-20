@@ -92,73 +92,77 @@ def generate_display_tables(extension = [''], isWDL = False):
         if is_custom:
            sample_pids = {} # stores association between cluster ID and PAUIs
         
-        # get clusters data and put into array
+        # # get clusters data and put into array
         cluster_data = []
         bad_date_data = [] #store clusters with no-valid-date
         with open(cluster_file[i]) as inf:
             for entry in inf:
                 spent = entry.strip().split("\t")
-                if spent[0] == "cluster_id": 
+                if spent[0] == "cluster_id":
+                    # set dict keys based on header row
+                    keys = spent
                     continue
+                # set temporary dictionary from row
+                spent_dict = {keys[i]:spent[i] for i in range(len(keys))}
                 if is_custom:
                     #add California sample PAUIs
                     ids = ""
-                    pids_arr = get_sample_pauis(spent[-1],pid_assoc)
+                    pids_arr = get_sample_pauis(spent_dict['samples'],pid_assoc)
                     if pids_arr:
-                        sample_pids[spent[0]] = pids_arr
+                        sample_pids[spent_dict['cluster_id']] = pids_arr
                         ids = ",".join(pids_arr)
-                    spent.append(ids)
+                    spent_dict['PAUI'] = ids
                 #put potential origins and indices in descending order
-                if "," in spent[10]:
+                if "," in spent_dict['inferred_origin']:
                     #check if all confidences are equal
                     reorder = False
-                    confidences = spent[11].split(",")
+                    confidences = spent_dict['inferred_origin_confidence'].split(",")
                     firsti = confidences[0]
                     for i in range(1, len(confidences)):
                         if confidences[i] != firsti:
                             reorder = True
                             break
                     if reorder:
-                        origins = spent[10].split(",")
-                        spent[10] = ",".join(origins[::-1])
-                        spent[11] = ",".join(confidences[::-1])
+                        origins = spent_dict['inferred_origin'].split(",")
+                        spent_dict['inferred_origin'] = ",".join(origins[::-1])
+                        spent_dict['inferred_origin_confidence'] = ",".join(confidences[::-1])
                 #add additional field to handle asterisked growth values
-                spent.append(spent[4])
+                spent_dict['asterisk'] = spent_dict['growth_score']
                 #check for cluster with no-valid-dates
-                if spent[2] == "no-valid-date" and spent[3] == "no-valid-date":
+                if spent_dict['earliest_date'] == "no-valid-date" and spent_dict['latest_date'] == "no-valid-date":
                     # add asterisk on growth values and put into separate array
-                    spent[-1] = spent[-1] + "*"
-                    bad_date_data.append(spent)
+                    spent_dict['asterisk'] = spent_dict['asterisk'] + "*"
+                    bad_date_data.append(spent_dict)
                 else:
                     #fix date format
-                    spent[2] = fix_month(spent[2])
-                    spent[3] = fix_month(spent[3])
-                    if int(spent[1]) <= 5:
+                    spent_dict['earliest_date'] = fix_month(spent_dict['earliest_date'])
+                    spent_dict['latest_date'] = fix_month(spent_dict['latest_date'])
+                    if int(spent_dict['sample_count']) <= 5:
                         # add asterisk on growth value
-                        spent[-1] = spent[-1] + "*"
-                    cluster_data.append(spent)
+                        spent_dict['asterisk'] = spent_dict['asterisk'] + "*"
+                    cluster_data.append(spent_dict)
         
-        #now, sort by growth score
-        cluster_data.sort(key = lambda x: x[4], reverse = True)
+        # now, sort by growth score
+        cluster_data = sorted(cluster_data, key=lambda d: d['growth_score'], reverse=True)
         # sort clusters with no-valid-date by growth score and append to cluster_data at the end
-        bad_date_data.sort(key = lambda x: x[4], reverse = True)
-        cluster_data.extend(bad_date_data)
+        bad_date_data = sorted(bad_date_data, key=lambda d: d['growth_score'], reverse=True)
 
+        cluster_data.extend(bad_date_data)
         #output data to be compatible with parse.JSON
         # -create as compact a string as possible,
         # -only add quotes to items that are strings to save space
         txt_data = "["
         txt_samples = "["
         for i, d in enumerate(cluster_data):
-            outline_data = [addq(d[0]), addq(d[9]), d[1], addq(d[2]), addq(d[3]), addq(d[12]), addq(d[13]), addq(d[10]), addq(d[11]), addq(d[-1])]
-            outline_samples = [addq(d[15])]
+            outline_data = [addq(d['cluster_id']), addq(d['region']), d['sample_count'], addq(d['earliest_date']), addq(d['latest_date']), addq(d['annotation_1']), addq(d['annotation_2']), addq(d['inferred_origin']), addq(d['inferred_origin_confidence']), addq(d['asterisk'])]
+            outline_samples = [addq(d['samples'])]
             if is_custom:
                 # get the number of PAUIS
                 npids = "0"
-                if d[16] != "":
-                    npids = str(d[16].count(',') + 1)
+                if d['PAUI'] != "":
+                    npids = str(d['PAUI'].count(',') + 1)
                 outline_data.append(npids)
-                outline_samples.append(addq(d[16]))
+                outline_samples.append(addq(d['PAUI']))
             txt_data += "[" + ",".join(outline_data) + "]"
             txt_samples += "[" + ",".join(outline_samples) + "]"
             if i == len(cluster_data)-1:
